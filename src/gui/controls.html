@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Emerald Controls</title>
+      <link rel="stylesheet" href="reset.css">
+      <link rel="stylesheet" href="controls.css">
+    </head>
+    <body>
+      <div class="wrapper v-group">
+        <div class="header h-flex h-group">
+          <h1 class="logo"><img src="../assets/logo.png">Emerald</h1>
+        </div>
+        <div class="navigation h-flex h-group">
+          <button data-page="slides">Slides</button>
+          <button data-page="files">Files</button>
+          <button data-page="settings">Settings</button>
+          <button data-page="surfaces">Surfaces</button>
+          <button data-page="mapping">Mapping</button>
+          <button data-page="output">Output</button>
+          <button data-page="system">System</button>
+        </div>
+        <div class="selection h-flex h-group">
+          <div class="box">Active Slide: <span id="activeSlide"></span></div>
+          <div class="box">Active Surface: <span id="activeSurface"></span></div>
+          <div class="box">Active Point: <span id="activePoint"></span></div>
+        </div>
+        <div class="container v-flex v-group">
+          <div id="slides" class="v-flex page">
+            <h2>Slides</h2>
+            <div class="h-flex h-group">
+              <button name="createNew">Create New</button>
+            </div>
+            <ul id="slideList">
+            </ul>
+          </div>
+          <div id="surfaces" class="v-flex page">
+            <h2>Surfaces</h2>
+            <div class="h-flex h-group">
+              <button name="createNew">Create New</button>
+            </div>
+            <ul id="surfaceList">
+            </ul>
+          </div>
+          <div id="mapping" class="v-flex page">
+            <h2>Mapping</h2>
+            <div class="h-flex h-group">
+              <button name="resetSurface">Reset Surface</button>
+              <button name="resetMask">Reset Mask</button>
+            </div>
+            <div class="screen"></div>
+            <div class="h-flex h-group">
+              <button name="insertBefore">Insert Before</button>
+              <button name="removePoint">Remove Point</button>
+              <button name="insertAfter">Insert After</button>
+            </div>
+          </div>
+          <div id="files" class="v-flex page">
+            <h2>Files</h2>
+            <div class="h-flex h-group">
+              <button name="addFolder">Add Folder</button>
+              <button name="addSubFolder">Add Subfolders</button>
+              <button name="addFile">Add File</button>
+            </div>
+            <div id="fileResult" class="box"></div>
+            <ul id="fileList">
+            </ul>
+          </div>
+          <div id="settings" class="v-flex page">
+            <h2>Settings</h2>
+            <ul>
+
+              <li>
+                <h3>Timing</h3>
+                <label>FPS</label>
+                <input type="number" name="fps"/>
+                <label>Pick Interval</label>
+                <input type="number" name="pick"/>
+                <label>In Phase Time</label>
+                <input type="number" name="in"/>
+              </li>
+
+              <li>
+                <h3>Transformation</h3>
+                <label>Base Scale</label>
+                <input type="number" name="scale"/>
+                <label>Start Scale</label>
+                <input type="number" name="startScale"/>
+                <label>Max Rotation</label>
+                <input type="number" name="maxRotation"/>
+              </li>
+              </li>
+
+              <li>
+                <h3>Positioning</h3>
+
+                <div class="h-group h-flex">
+                  <div class="flex">
+                    <label>Horizontal Start Position</label>
+                    <input type="number" name="startX"/>
+                  </div>
+                  <div class="flex">
+                    <label>Vertical Start Position</label>
+                    <input type="number" name="startY"/>
+                  </div>
+                </div>
+
+                <div class="h-group h-flex">
+                  <div class="flex">
+                    <label>Random Horizontal Offset</label>
+                    <input type="number" name="randomX"/>
+                  </div>
+                  <div class="flex">
+                    <label>Random Vertical Offset</label>
+                    <input type="number" name="randomY"/>
+                  </div>
+                </div>
+
+                <div class="h-group h-flex">
+                  <div class="flex">
+                    <label>Horizontal Target Position</label>
+                    <input type="number" name="targetX"/>
+                  </div>
+                  <div class="flex">
+                    <label>Vertical Target Position</label>
+                    <input type="number" name="targetY"/>
+                  </div>
+                </div>
+
+                <div class="h-group h-flex">
+                  <div class="flex">
+                    <label>Random Horizontal Target Offset</label>
+                    <input type="number" name="targetRandomX"/>
+                  </div>
+                  <div class="flex">
+                    <label>Random Vertical Target Offset</label>
+                    <input type="number" name="targetRandomY"/>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <h3>Renderer</h3>
+                <div class="h-group h-flex">
+                  <div class="flex">
+                    <label>Texture Width</label>
+                    <input type="number" name="width"/>
+                  </div>
+                  <div class="flex">
+                    <label>Texture height</label>
+                    <input type="number" name="height"/>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div id="output" class="v-flex page">
+            <h2>Output</h2>
+            <div class="h-flex h-group">
+              <button name="fullscreenOutput">Fullscreen</button>
+              <button name="windowOutput">Window</button>
+            </div>
+            <ul>
+              <li>
+                <label>Master</label>
+                <input type="range" name="master"/>
+              </li>
+            </ul>
+          </div>
+          <div id="system" class="v-flex page">
+            <h2>System</h2>
+            <div class="h-flex h-group">
+              <button name="loadState">Load</button>
+              <button name="saveState">Save</button>
+            </div>
+          </div>
+          <div>© 2018 - rnd7</div>
+        </div>
+      </div>
+    </div>
+      <script>
+        require('../lib/console.js').setLogLevel(4)
+        const THREE = require('three')
+        const { randomString } = require('../lib/stringUtil.js')
+        const { walk } = require('../lib/fsUtil.js')
+        const { makeDefaultSlide, makeDefaultState, makeDefaultSurface, makeDefaultMask } = require('../lib/data.js')
+        const remote = require('electron').remote
+        const dialog = remote.dialog; // Load the dialogs component of the OS
+        const fs = require('fs')
+        const ipc = require('electron').ipcRenderer
+        const Warp = require('../lib/warp.js')
+        const defaultTex = require('../lib/defaultTex.js')
+        const { randomName } = require('../lib/greekNames.js')
+
+        const MAX_WALK_RECURSION = 12
+
+
+        let state = makeDefaultState()
+
+        function updateNavigation() {
+          const buttons = document.querySelectorAll('.navigation button')
+          buttons.forEach(button => {
+            button.style.backgroundColor = '#221100'
+          })
+          document.querySelector('.navigation button[data-page='+state.page+']').style.backgroundColor = '#776600'
+        }
+
+        function updatePages() {
+          const pages = document.querySelectorAll('.container > .page')
+          pages.forEach(page => {
+            page.style.display = 'none'
+          })
+          document.querySelector('#'+state.page).style.display = 'flex'
+          if (state.page === "mapping") warp.resize()
+        }
+
+        function updateWarp() {
+          warp.setSurfaces(state.surfaces)
+          defaultTex.getTexture((tex) => {
+            for (var surfaceId in state.surfaces) {
+              warp.setSurfaceTexture(surfaceId, tex)
+            }
+          })
+        }
+
+        function updateSurfaceList() {
+          const list = document.querySelector("#surfaceList")
+          while (list.firstChild) list.removeChild(list.firstChild)
+          for(let k in state.surfaces) {
+            const li = document.createElement('LI')
+            li.dataset.surfaceId = k
+            if(state.activeSurface === k) li.classList.add('active')
+
+            const idLabel = document.createElement('LABEL')
+            idLabel.innerHTML = "ID"
+            li.appendChild(idLabel)
+            const idElem = document.createElement('DIV')
+            idElem.innerHTML = k
+            li.appendChild(idElem)
+
+            const formElem = document.createElement('FORM')
+            const nameLabel = document.createElement('LABEL')
+            nameLabel.innerHTML = "Name"
+            formElem.appendChild(nameLabel)
+            const nameElem = document.createElement('INPUT')
+            nameElem.value = state.surfaces[k].name
+            formElem.onsubmit = (e) => {
+              e.preventDefault()
+              setSurface(k, {name: nameElem.value})
+            }
+            formElem.appendChild(nameElem)
+            li.appendChild(formElem)
+
+            const textureLabel = document.createElement('LABEL')
+            textureLabel.innerHTML = "Texture"
+            li.appendChild(textureLabel)
+            const selectElement = document.createElement('SELECT')
+            selectElement.dataset.surfaceId = k
+            selectElement.classList.add('textureSelect')
+            makeSelectTextureOptions(selectElement)
+            selectElement.onchange = (e) => {
+              e.stopImmediatePropagation()
+              e.preventDefault()
+              setSurfaceTexture(k, event.target.value || null )
+            }
+            li.appendChild(selectElement)
+
+            const removeButton = document.createElement('BUTTON')
+            removeButton.innerHTML = "Remove"
+            removeButton.onclick = (e) => {
+              e.preventDefault()
+              e.stopImmediatePropagation()
+              removeSurface(k)
+
+            }
+
+            li.appendChild(removeButton)
+
+            li.onclick = () => {
+              setActiveSurface(k)
+            }
+            list.appendChild(li)
+          }
+        }
+
+        function updateSurface(id) {
+        }
+
+        function updateSurfaces() {
+          updateWarp()
+          updateSurfaceList()
+        }
+
+        const fpsInput = document.querySelector("#settings input[name=fps]")
+        const scaleInput = document.querySelector("#settings input[name=scale]")
+        const maxRotationInput = document.querySelector("#settings input[name=maxRotation]")
+        const pickInput = document.querySelector("#settings input[name=pick]")
+        const inInput = document.querySelector("#settings input[name=in]")
+        const startScaleInput = document.querySelector("#settings input[name=startScale]")
+
+        const startXInput = document.querySelector("#settings input[name=startX]")
+        const startYInput = document.querySelector("#settings input[name=startY]")
+        const randomXInput = document.querySelector("#settings input[name=randomX]")
+        const randomYInput = document.querySelector("#settings input[name=randomY]")
+
+        const targetXInput = document.querySelector("#settings input[name=targetX]")
+        const targetYInput = document.querySelector("#settings input[name=targetY]")
+        const targetRandomXInput = document.querySelector("#settings input[name=targetRandomX]")
+        const targetRandomYInput = document.querySelector("#settings input[name=targetRandomY]")
+
+        const widthInput = document.querySelector("#settings input[name=width]")
+        const heightInput = document.querySelector("#settings input[name=height]")
+
+        function updateSlideSettings() {
+
+          if (state.activeSlide) {
+            const slide = state.slides[state.activeSlide]
+
+            fpsInput.value = slide.fps
+            scaleInput.value = slide.scale
+            maxRotationInput.value = slide.maxRotation*360
+            pickInput.value = slide.pick/1000
+            inInput.value = slide.in/1000
+            startScaleInput.value = slide.startScale
+
+            startXInput.value = slide.startX
+            startYInput.value = slide.startY
+            randomXInput.value = slide.randomX
+            randomYInput.value = slide.randomY
+
+            targetXInput.value = slide.targetX
+            targetYInput.value = slide.targetY
+            targetRandomXInput.value = slide.targetRandomX
+            targetRandomYInput.value = slide.targetRandomY
+
+            widthInput.value = slide.width
+            heightInput.value = slide.height
+          }
+
+        }
+
+        const fileResultElement = document.querySelector("#fileResult")
+        const fileListElement = document.querySelector("#fileList")
+
+        function updateFileList() {
+          while (fileListElement.firstChild)
+            fileListElement.removeChild(fileListElement.firstChild)
+
+          if (state.activeSlide) {
+            document.querySelectorAll("#files button").forEach(elem => {
+              elem.disabled = false
+            })
+            const files = state.slides[state.activeSlide].files
+            const fileLen = files.length
+            fileResultElement.innerHTML = fileLen
+              + ' Files assigned to Active Slide'
+            for (let index = 0; index < fileLen; index++) {
+
+              const file = files[index]
+              const li = document.createElement('LI')
+              li.classList.add("fileListItem")
+
+              const fileListItemContainer = document.createElement('DIV')
+              li.appendChild(fileListItemContainer)
+
+              const fileNameElement = document.createElement('DIV')
+              fileNameElement.innerHTML = file
+              fileListItemContainer.appendChild(fileNameElement)
+
+              const removeButton = document.createElement('BUTTON')
+              removeButton.innerHTML = "X"
+              removeButton.onclick = (e) => {
+                e.preventDefault()
+                e.stopImmediatePropagation()
+                removeFile(state.activeSlide, index)
+              }
+              li.appendChild(removeButton)
+              fileListElement.appendChild(li)
+            }
+          } else {
+            fileResultElement.innerHTML = "No Slide selected."
+            document.querySelectorAll("#files button").forEach(elem => {
+              elem.disabled = true
+            })
+          }
+        }
+
+
+        function makeSelectTextureOptions(select) {
+          const nullOption = document.createElement('OPTION')
+          nullOption.value = ""
+          nullOption.text = "Calibration Texture"
+          if (!state.surfaces[select.dataset.surfaceId].texture) nullOption.selected = "selected"
+          select.appendChild(nullOption)
+          for (var slideId in state.slides) {
+            const slideOption = document.createElement('OPTION')
+            slideOption.value = slideId
+            slideOption.text = state.slides[slideId].name
+            if (state.surfaces[select.dataset.surfaceId].texture === slideId) slideOption.selected = "selected"
+            select.appendChild(slideOption)
+          }
+        }
+
+        function updateSlideSelectOptions() {
+          const selects = document.querySelectorAll("select.textureSelect")
+          selects.forEach((select)=>{
+            while (select.firstChild) select.removeChild(select.firstChild)
+            makeSelectTextureOptions(select)
+          })
+        }
+
+        const slideListElement = document.querySelector("#slideList")
+
+        function updateSlideList() {
+          while (slideListElement.firstChild)
+            slideListElement.removeChild(slideListElement.firstChild)
+          for(let k in state.slides) {
+            const li = document.createElement('LI')
+            if(state.activeSlide === k) li.classList.add('active')
+            li.dataset.slideId = k
+            const idLabel = document.createElement('LABEL')
+            idLabel.innerHTML = "ID"
+            li.appendChild(idLabel)
+            const idElem = document.createElement('DIV')
+            idElem.innerHTML = k
+            li.appendChild(idElem)
+
+            const formElem = document.createElement('FORM')
+            const nameLabel = document.createElement('LABEL')
+            nameLabel.innerHTML = "Name"
+            formElem.appendChild(nameLabel)
+            const nameElem = document.createElement('INPUT')
+            nameElem.value = state.slides[k].name
+            formElem.onsubmit = (e) => {
+              e.preventDefault()
+              setSlide(k, {name: nameElem.value})
+            }
+            formElem.appendChild(nameElem)
+            li.appendChild(formElem)
+
+            const removeButton = document.createElement('BUTTON')
+            removeButton.innerHTML = "Remove"
+            removeButton.onclick = (e) => {
+              e.preventDefault()
+              e.stopImmediatePropagation()
+              removeSlide(k)
+            }
+            li.appendChild(removeButton)
+
+            li.onclick = (e) => {
+              e.preventDefault()
+              e.stopImmediatePropagation()
+              setActiveSlide(k)
+            }
+            slideListElement.appendChild(li)
+          }
+        }
+
+        function updateSlide(id) {
+          if(id === state.activeSlide) {
+            updateFileList()
+            updateSlideSettings()
+          }
+
+        }
+
+        function updateSlides() {
+          updateSlideList()
+          updateSlideSelectOptions()
+        }
+
+        const activeSurfaceElement = document.querySelector("#activeSurface")
+        function updateActiveSurface() {
+          if (state.activeSurface) {
+            activeSurfaceElement.innerHTML = state.surfaces[state.activeSurface].name
+          } else {
+            activeSurfaceElement.innerHTML = "none"
+          }
+          const list = document.querySelectorAll("#surfaceList li")
+          list.forEach((item)=>{
+            if (item.classList.contains('active')) item.classList.remove('active')
+          })
+          if(state.activeSurface) {
+            warp.showPoints(state.activeSurface)
+            warp.showMaskHelper(state.activeSurface)
+            var elem = document.querySelector("#surfaceList li[data-surface-id="+state.activeSurface+"]")
+            if (elem) elem.classList.add('active')
+          }else{
+            warp.hidePoints()
+            warp.hideMaskHelper(state.activeSurface)
+          }
+        }
+
+        const activeSlideElement = document.querySelector("#activeSlide")
+
+        function updateActiveSlide() {
+          if (state.activeSlide) {
+            activeSlideElement.innerHTML = state.slides[state.activeSlide].name
+          } else {
+            activeSlideElement.innerHTML = "none"
+          }
+          const list = document.querySelectorAll("#slideList li")
+          list.forEach((item)=>{
+            if (item.classList.contains('active')) item.classList.remove('active')
+          })
+          if(state.activeSlide) {
+            var elem = document.querySelector("#slideList li[data-slide-id="+state.activeSlide+"]")
+            if (elem) elem.classList.add('active')
+          }
+          updateFileList()
+          updateSlideSettings()
+        }
+
+        const activePointElement = document.querySelector("#activePoint")
+
+        function updateActivePoint() {
+          if (state.activePoint) {
+            activePointElement.innerHTML = state.activePoint.toUpperCase()
+          } else {
+            activePointElement.innerHTML = "none"
+          }
+        }
+
+        const masterInput = document.querySelector("#output input[name=master]")
+        function updateMaster() {
+          masterInput.value = Math.max(0, Math.min(100, Math.round(state.master*50)))
+        }
+
+        function setMaster(value) {
+          state.master = value
+          updateMaster()
+          ipc.send("output", "setMaster", value)
+        }
+
+        function setPage(page) {
+          state.page = page
+          updatePages()
+          updateNavigation()
+        }
+
+
+        function setActiveSurface(id) {
+          state.activeSurface = id
+          updateActiveSurface()
+        }
+
+        function setActiveSlide(id) {
+          state.activeSlide = id
+          updateActiveSlide()
+        }
+
+        function setActivePoint(id) {
+          state.activePoint = id
+          updateActivePoint()
+        }
+
+        function setActiveMaskPoint(id) {
+          state.activeMaskPoint = id
+          //updateActivePoint()
+        }
+
+        function setSurfaceTexture(surface, texture) {
+          state.surfaces[surface].texture = texture
+          updateSurface(surface)
+          ipc.send('output', 'setSurfaceTexture', surface, texture)
+        }
+
+        function setSurface(id, surface) {
+          state.surfaces[id] = Object.assign(state.surfaces[id] || {}, surface)
+          updateSurface(id)
+          ipc.send('output', 'setSurface', id, state.surfaces[id])
+        }
+
+        function createSurface(id, surface) {
+          state.surfaces[id] = Object.assign(state.surfaces[id] || {}, surface)
+          updateSurfaces()
+          ipc.send('output', 'createSurface', id, state.surfaces[id])
+          setActiveSurface(id)
+          setSurfaceTexture(id, null)
+        }
+
+        function removeSurface(id) {
+          delete state.surfaces[id]
+          if (state.activeSurface === id) setActiveSurface(null)
+          updateSurfaces()
+          ipc.send('output', 'removeSurface', id)
+        }
+
+        function setSurfaces(surfaces) {
+          state.surfaces = surfaces
+          if (!state.surfaces[state.activeSurface]) setActiveSurface(null)
+          updateSurfaces()
+          ipc.send('output', 'setSurfaces', surfaces)
+        }
+
+        function setSurfacePoints(surfaceId, points) {
+          state.surfaces[surfaceId].a = points.a
+          state.surfaces[surfaceId].b = points.b
+          state.surfaces[surfaceId].c = points.c
+          state.surfaces[surfaceId].d = points.d
+          updateSurface(surfaceId)
+          ipc.send('output', 'setSurface', surfaceId, state.surfaces[surfaceId])
+        }
+
+        function setSurfaceMaskPoints(surfaceId, points) {
+          state.surfaces[surfaceId].mask = points
+          ipc.send('output', 'setSurfaceMaskPoints', surfaceId, state.surfaces[surfaceId].mask)
+        }
+
+        function setSlide(id, slide) {
+          if (!state.slides[id]) return createSlide(id)
+          Object.assign(state.slides[id], slide)
+          updateSlide(id)
+          ipc.send('output', 'setSlide', id, state.slides[id])
+        }
+
+        function createSlide(id, slide) {
+          state.slides[id] = slide
+          updateSlides()
+          updateSlideSelectOptions()
+          ipc.send('output', 'createSlide', id, state.slides[id])
+          setActiveSlide(id)
+        }
+
+        function removeSlide(id) {
+          delete state.slides[id]
+          if (state.activeSlide === id) setActiveSlide(null)
+          for(var k in state.surfaces) {
+            if (state.surfaces[k].texture === id) setSurfaceTexture(k, null)
+          }
+          updateSlides()
+          updateSlideSelectOptions()
+          ipc.send('output', 'removeSlide', id)
+        }
+
+        function setSlides(slides) {
+          state.slides = slides
+          if (!state.slides[state.activeSlide]) setActiveSlide(null)
+          updateSlides()
+          updateSlideSelectOptions()
+          ipc.send('output', 'setSlides', slides)
+        }
+
+        function removeFile(slideId, index) {
+          let files = [].concat(state.slides[slideId].files)
+          files.splice(index, 1)
+          setSlide(slideId, {files})
+        }
+
+        function setFullScreen(value) {
+          ipc.send(value ? "fullscreenOutput" : "windowOutput")
+        }
+
+        function setState(newState) {
+          state = newState
+          updatePages()
+          updateNavigation()
+          updateSurfaces()
+          updateSlides()
+          updateSlideSelectOptions()
+          updateActiveSurface()
+          updateActiveSlide()
+          updateActivePoint()
+          updateMaster()
+          ipc.send('output', 'setState', state)
+        }
+
+
+
+        document.querySelectorAll('.navigation button').forEach(button=>{
+          button.addEventListener(
+            'click',
+            (e) => {
+              e.preventDefault()
+              setPage(button.dataset.page)
+            }
+          )
+        })
+
+        document.querySelector('#slides button[name=createNew]').addEventListener(
+          'click',
+          (e) => {
+            e.preventDefault()
+            const slide = makeDefaultSlide()
+            slide.name = randomName()
+            createSlide(randomString(), slide)
+          }
+        )
+
+        document.querySelector('#surfaces button[name=createNew]').addEventListener(
+          'click',
+          (e) => {
+            e.preventDefault()
+            const surf = makeDefaultSurface()
+            surf.name = randomName()
+            createSurface(randomString(), surf)
+          }
+        )
+
+        document.querySelector('#files button[name=addFolder]').addEventListener(
+          'click',
+          (e) => {
+            const activeSlide = state.activeSlide
+            dialog.showOpenDialog({properties: ['openDirectory']}, (fileNames) => {
+                // fileNames is an array that contains all the selected
+                if(fileNames.length) {
+                  const path = fileNames[0]
+                  walk(path, (err, results) => {
+                    setSlide(activeSlide, {files: state.slides[activeSlide].files.concat(results)})
+                  })
+                }
+            });
+
+          }
+        )
+
+        document.querySelector('#files button[name=addSubFolder]').addEventListener(
+          'click',
+          (e) => {
+            const activeSlide = state.activeSlide
+            dialog.showOpenDialog({properties: ['openDirectory']}, (fileNames) => {
+                // fileNames is an array that contains all the selected
+                if(fileNames.length) {
+                  const path = fileNames[0]
+                  walk(path, (err, results) => {
+                    setSlide(activeSlide, {files: state.slides[activeSlide].files.concat(results)})
+                  }, MAX_WALK_RECURSION)
+                }
+            });
+
+          }
+        )
+
+        document.querySelector('#files button[name=addFile]').addEventListener(
+          'click',
+          (e) => {
+            const activeSlide = state.activeSlide
+            dialog.showOpenDialog({properties: ['openFile']}, (fileNames) => {
+                // fileNames is an array that contains all the selected
+                if(fileNames.length) {
+                  setSlide(activeSlide, {files: state.slides[activeSlide].files.concat(fileNames)})
+                }
+            });
+
+          }
+        )
+
+        document.querySelector('#settings input[name=fps]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {fps: parseInt(e.target.value)})
+          }
+        )
+
+        document.querySelector('#settings input[name=scale]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {scale: parseFloat(e.target.value)})
+          }
+        )
+
+        document.querySelector('#settings input[name=maxRotation]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {maxRotation: parseInt(e.target.value)/360})
+          }
+        )
+
+        document.querySelector('#settings input[name=pick]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {pick: Math.round(parseFloat(e.target.value)*1000)})
+          }
+        )
+
+        document.querySelector('#settings input[name=in]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {in: Math.round(parseFloat(e.target.value)*1000)})
+          }
+        )
+
+        document.querySelector('#settings input[name=startScale]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {startScale: parseFloat(e.target.value)})
+          }
+        )
+
+
+        document.querySelector('#settings input[name=startX]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {startX: parseFloat(e.target.value)})
+          }
+        )
+
+
+        document.querySelector('#settings input[name=startY]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {startY: parseFloat(e.target.value)})
+          }
+        )
+
+
+        document.querySelector('#settings input[name=targetX]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {targetX: parseFloat(e.target.value)})
+          }
+        )
+
+
+        document.querySelector('#settings input[name=targetY]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {targetY: parseFloat(e.target.value)})
+          }
+        )
+
+
+        document.querySelector('#settings input[name=randomX]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {randomX: parseFloat(e.target.value)})
+          }
+        )
+
+
+        document.querySelector('#settings input[name=randomY]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {randomY: parseFloat(e.target.value)})
+          }
+        )
+
+        document.querySelector('#settings input[name=targetRandomX]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {targetRandomX: parseFloat(e.target.value)})
+          }
+        )
+
+
+        document.querySelector('#settings input[name=targetRandomY]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {targetRandomY: parseFloat(e.target.value)})
+          }
+        )
+
+
+        document.querySelector('#settings input[name=width]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {width:parseInt(e.target.value)})
+          }
+        )
+
+        document.querySelector('#settings input[name=height]').addEventListener(
+          'change',
+          (e) => {
+            setSlide(state.activeSlide, {height:parseInt(e.target.value)})
+          }
+        )
+
+        document.querySelector('#mapping button[name=resetSurface]').addEventListener(
+          'click',
+          (e) => {
+            const defSurf = makeDefaultSurface()
+            setSurface(state.activeSurface, {a: defSurf.a, b: defSurf.b, c: defSurf.c, d: defSurf.d})
+            warp.setSurface(state.activeSurface, state.surfaces[state.activeSurface])
+            setActiveSurface(state.activeSurface)
+          }
+        )
+
+        document.querySelector('#mapping button[name=resetMask]').addEventListener(
+          'click',
+          (e) => {
+            setSurface(state.activeSurface, {mask:makeDefaultMask()})
+            warp.setSurface(state.activeSurface, state.surfaces[state.activeSurface])
+            setActiveSurface(state.activeSurface)
+          }
+        )
+
+        document.querySelector('#mapping button[name=insertBefore]').addEventListener(
+          'click',
+          (e) => {
+            const mask = state.surfaces[state.activeSurface].mask
+            const currentPoint = mask[state.activeMaskPoint]
+            const prevIndex = (state.activeMaskPoint-1+mask.length)%mask.length
+            const prevPoint = mask[prevIndex]
+            const newPoint = new THREE.Vector2().lerpVectors(currentPoint, prevPoint, .5)
+            mask.splice(state.activeMaskPoint, 0, newPoint)
+            setSurface(state.activeSurface, {mask})
+            warp.setSurface(state.activeSurface, state.surfaces[state.activeSurface])
+            setActiveSurface(state.activeSurface)
+          }
+        )
+
+        document.querySelector('#mapping button[name=insertAfter]').addEventListener(
+          'click',
+          (e) => {
+            const mask = state.surfaces[state.activeSurface].mask
+            const currentPoint = mask[state.activeMaskPoint]
+            const nextIndex = (state.activeMaskPoint+1)%mask.length
+            const nextPoint = mask[nextIndex]
+            const newPoint = new THREE.Vector2().lerpVectors(currentPoint, nextPoint, .5)
+            mask.splice(nextIndex, 0, newPoint)
+            setSurface(state.activeSurface, {mask})
+            warp.setSurface(state.activeSurface, state.surfaces[state.activeSurface])
+            setActiveSurface(state.activeSurface)
+          }
+        )
+
+        document.querySelector('#mapping button[name=removePoint]').addEventListener(
+          'click',
+          (e) => {
+            const mask = state.surfaces[state.activeSurface].mask
+            mask.splice(state.activeMaskPoint, 1)
+            setSurface(state.activeSurface, {mask})
+            warp.setSurface(state.activeSurface, state.surfaces[state.activeSurface])
+            setActiveSurface(state.activeSurface)
+            //setSlide(state.activeSlide, {height:parseInt(e.target.value)})
+          }
+        )
+
+        document.querySelector('#output button[name=fullscreenOutput]').addEventListener(
+          'click',
+          (e) => {
+            setFullScreen(true)
+          }
+        )
+
+        document.querySelector('#output button[name=windowOutput]').addEventListener(
+          'click',
+          (e) => {
+            setFullScreen(false)
+          }
+        )
+        function onMasterInputChange(e) {
+          setMaster(parseFloat(e.target.value)/100 * 2)
+        }
+        masterInput.addEventListener('change', onMasterInputChange)
+        masterInput.addEventListener('input', onMasterInputChange)
+
+
+
+        document.querySelector('#system button[name=saveState]').addEventListener(
+          'click',
+          (e) => {
+            const stateString = JSON.stringify(state)
+            console.log("save state", stateString)
+            dialog.showSaveDialog({
+                title: 'Save Emerald State',
+                defaultPath: '~/emerald.json'
+              }, (result) => {
+                console.log("save to ", result)
+                fs.writeFile(result, stateString, (err) => {
+                  if(err) return console.warn(err)
+                  console.log("The file was saved!")
+                })
+            })
+          }
+        )
+
+
+        document.querySelector('#system button[name=loadState]').addEventListener(
+          'click',
+          (e) => {
+            const stateString = JSON.stringify(state)
+            console.log("load state", stateString)
+            dialog.showOpenDialog({
+                title: 'Load Emerald State',
+                defaultPath: '~/'
+              }, (result) => {
+                console.log("load", result)
+                if(!result || !result.length) return
+                fs.readFile(result[0], (err, data) => {
+                  if(err) return console.warn(err)
+                  console.log("The file was loaded!")
+                  let newState
+                  try {
+                    newState = JSON.parse(data)
+                  } catch (e) {
+                    console.warn("error parsing file", e)
+                  }
+                  if (newState) setState(newState)
+                })
+            })
+          }
+        )
+
+
+        const screen = document.querySelector("#mapping .screen")
+        const warp = Warp.init(null, screen)
+
+
+        let foundPoint = false
+        function mouseDown(e) {
+          let clientX = null
+          let clientY = null
+          const screenBox = screen.getBoundingClientRect()
+          const x =  e.clientX- screenBox.left
+          const y =  e.clientY- screenBox.top
+          const pointsUnderMouse = warp.findPoint(x,y)
+          const maskPointsUnderMouse = warp.findMaskPoint(x,y)
+          if(maskPointsUnderMouse.length) {
+            setActiveMaskPoint(maskPointsUnderMouse[0])
+            foundPoint = true
+            const onWindowMouseUp = (e) => {
+              window.removeEventListener('mouseup', onWindowMouseUp)
+              window.removeEventListener('mousemove', onWindowMouseMove)
+              window.removeEventListener('mouseleave', onWindowMouseLeave)
+            }
+            const onWindowMouseMove = (e) => {
+              if(clientX === null) clientX = e.clientX
+              if(clientY === null) clientY = e.clientY
+              warp.moveSurfaceMaskPoint(
+                state.activeSurface,
+                state.activeMaskPoint,
+                e.clientX-clientX,
+                e.clientY-clientY
+              )
+              clientX = e.clientX
+              clientY = e.clientY
+              setSurfaceMaskPoints(state.activeSurface, warp.getSurfaceMaskPoints(state.activeSurface))
+
+            }
+            const onWindowMouseLeave = (e) => {
+              window.removeEventListener('mouseup', onWindowMouseUp)
+              window.removeEventListener('mousemove', onWindowMouseMove)
+              window.removeEventListener('mouseleave', onWindowMouseLeave)
+            }
+            window.addEventListener('mouseup', onWindowMouseUp)
+            window.addEventListener('mousemove', onWindowMouseMove)
+            window.addEventListener('mouseleave', onWindowMouseLeave)
+          } else if (pointsUnderMouse.length) {
+            setActivePoint(pointsUnderMouse[0])
+            foundPoint = true
+            const onWindowMouseUp = (e) => {
+              window.removeEventListener('mouseup', onWindowMouseUp)
+              window.removeEventListener('mousemove', onWindowMouseMove)
+              window.removeEventListener('mouseleave', onWindowMouseLeave)
+            }
+            const onWindowMouseMove = (e) => {
+              if(clientX === null) clientX = e.clientX
+              if(clientY === null) clientY = e.clientY
+              warp.moveSurfacePoint(
+                state.activeSurface,
+                state.activePoint,
+                e.clientX-clientX,
+                e.clientY-clientY
+              )
+              clientX = e.clientX
+              clientY = e.clientY
+              setSurfacePoints(state.activeSurface, warp.getSurfacePoints(state.activeSurface))
+
+            }
+            const onWindowMouseLeave = (e) => {
+              window.removeEventListener('mouseup', onWindowMouseUp)
+              window.removeEventListener('mousemove', onWindowMouseMove)
+              window.removeEventListener('mouseleave', onWindowMouseLeave)
+            }
+            window.addEventListener('mouseup', onWindowMouseUp)
+            window.addEventListener('mousemove', onWindowMouseMove)
+            window.addEventListener('mouseleave', onWindowMouseLeave)
+          } else {
+            foundPoint = false
+            setActivePoint(null)
+            setActiveMaskPoint(null)
+          }
+          //this.update()
+        }
+
+        function mouseUp(e) {
+          if (foundPoint) return
+          let clientX = e.clientX
+          let clientY = e.clientY
+          const screenBox = screen.getBoundingClientRect()
+          const x = clientX- screenBox.left
+          const y = clientY- screenBox.top
+          const surfacesUnderMouse = warp.findSurface(x,y)
+          if (surfacesUnderMouse.length) {
+            setActiveSurface(surfacesUnderMouse[0])
+          } else {
+            setActivePoint(null)
+            setActiveMaskPoint(null)
+            setActiveSurface(null)
+          }
+          //this.update()
+        }
+
+        screen.addEventListener('mousedown', mouseDown)
+        screen.addEventListener('mousedown', mouseUp)
+
+        function init() {
+          updatePages()
+          updateNavigation()
+          updateActivePoint()
+          updateActiveSlide()
+          updateActiveSurface()
+          updateMaster()
+        }
+        init()
+      </script>
+    </body>
+  </html>

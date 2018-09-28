@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Emerald Output</title>
+      <link rel="stylesheet" href="reset.css">
+      <link rel="stylesheet" href="output.css">
+    </head>
+    <body>
+      <div class="screen"></div>
+      <script>
+        require('../lib/console.js').setLogLevel(4)
+        const THREE = require('three')
+        const remote = require('electron').remote
+        const ipc = require('electron').ipcRenderer
+        const defaultTex = require('../lib/defaultTex.js')
+        const Warp = require('../lib/warp.js')
+        const Slide = require('../lib/slide.js')
+
+        const slides = {}
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, stencil: false, powerPreference: "high-performance", depth: false, precision: "mediump" })
+
+        ipc.on('createSurface', (event, id, surface) => {
+          warp.setSurface(id, surface)
+        })
+
+        ipc.on('setSurface', (event, id, surface) => {
+          warp.setSurface(id, surface)
+        })
+
+        ipc.on('setSurfaceMaskPoints', (event, id, points) => {
+          warp.setSurfaceMaskPoints(id, points)
+        })
+
+        ipc.on('removeSurface', (event, id) => {
+          warp.removeSurface(id)
+        })
+
+        function setSurfaces(surfaces) {
+          warp.setSurfaces(surfaces)
+        }
+
+        ipc.on('setSurfaces', (event, surfaces) => { setSurfaces(surfaces) })
+
+        ipc.on('setMaster', (event, value) => {
+          warp.setMaster(value)
+        })
+
+        function setSurfaceTexture(surface, texture){
+          if(!texture) {
+            defaultTex.getTexture((tex) => {
+              warp.setSurfaceTexture(surface, tex)
+            })
+          } else {
+            warp.setSurfaceTexture(surface, slides[texture].buffer.texture)
+          }
+        }
+
+        ipc.on('setSurfaceTexture', (event, surface, texture) => {
+          setSurfaceTexture(surface, texture)
+        })
+
+        ipc.on('createSlide', (event, id, slide) => { setSlide(id, slide) })
+
+        function setSlide(id, slide) {
+          console.log("setSlide", id, slide)
+          if (!slides[id]) {
+            console.log("create new slide")
+            slides[id] = Slide.makeSlide(renderer)
+          }
+          if(slide.files instanceof Array) slides[id].files = slide.files
+          if(typeof slide.in === "number") slides[id].inTime = slide.in
+          if(typeof slide.pick === "number" && slide.pick > 40) slides[id].pickInterval = slide.pick
+          if(typeof slide.startScale === "number") slides[id].startScale = slide.startScale
+          if(typeof slide.startX === "number") slides[id].startX = slide.startX
+          if(typeof slide.startY === "number") slides[id].startY = slide.startY
+          if(typeof slide.targetX === "number") slides[id].targetX = slide.targetX
+          if(typeof slide.targetY === "number") slides[id].targetY = slide.targetY
+          if(typeof slide.randomX === "number") slides[id].randomX = slide.randomX
+          if(typeof slide.randomY === "number") slides[id].randomY = slide.randomY
+          if(typeof slide.targetRandomX === "number") slides[id].targetRandomX = slide.targetRandomX
+          if(typeof slide.targetRandomY === "number") slides[id].targetRandomY = slide.targetRandomY
+          if(typeof slide.scale === "number") slides[id].scale = slide.scale
+          if(typeof slide.fps === "number" && slide.fps <= 120 && slide.fps > 0 ) slides[id].fps = slide.fps
+          if(typeof slide.maxRotation === "number") slides[id].maxRotation = slide.maxRotation
+          if(typeof slide.width === "number" && typeof slide.height === "number") slides[id].setSize(slide.width, slide.height)
+
+          console.log("set slide data", slides[id])
+
+        }
+        ipc.on('setSlide', (event, id, slide) => { setSlide(id, slide) })
+
+        function removeSlide(id) {
+          if(slides[id]) slides[id].destroy()
+          delete slides[id]
+        }
+
+        ipc.on('removeSlide', (event, id) => { removeSlide(id) })
+
+        function setSlides(data) {
+          console.log("setSlides", data)
+          const removal = Object.keys(slides)
+          for (var slideId in data) {
+            const removalIndex = removal.indexOf(slideId)
+            if (removalIndex != -1) {
+              removal.splice(removalIndex, 1)
+            }
+            setSlide(slideId, data[slideId])
+          }
+          // remove obsolete
+          removal.forEach((slideId) => {
+            removeSlide(slideId)
+          })
+        }
+        ipc.on('setSlides', (event, slides) => { setSlides(slides) })
+
+        function setState(state) {
+          console.log("setState", state)
+          if (state.slides) setSlides(state.slides)
+          if (state.surfaces) setSurfaces(state.surfaces)
+          for (var surfaceId in state.surfaces) {
+            setSurfaceTexture(surfaceId, state.surfaces[surfaceId].texture)
+          }
+        }
+        ipc.on('setState', (event, state) => { setState(state) })
+
+
+
+
+
+        const screen = document.querySelector(".screen")
+        const warp = Warp.init(renderer, screen)
+
+        let animationFrame
+        function mainLoop() {
+          let renderNeccessary = false
+          for (var k in slides) {
+            slides[k].animate()
+            if(slides[k].renderNeccessary) {
+              slides[k].render()
+              renderNeccessary = true
+            }
+          }
+          animationFrame = requestAnimationFrame(mainLoop)
+          if (renderNeccessary) {
+            warp.render()
+          }
+        }
+        mainLoop()
+      </script>
+    </body>
+  </html>

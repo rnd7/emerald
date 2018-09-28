@@ -1,0 +1,205 @@
+body {
+  display: flex;
+}
+
+button, input {
+  padding: 6px;
+}
+
+select {
+  padding: 5px;
+}
+
+button {
+  background-color: #776600;
+  color: #FFFFFF;
+}
+
+button:disabled {
+  background-color: #224400;
+  color: #FFFFFF;
+}
+
+input, select {
+  background-color: #111111;
+  color: #FFFFFF;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+option {
+  min-height: 1em;
+
+  padding: 6px;
+  background-color: #111111;
+  color: #FFFFFF;
+}
+
+h1, h2, h3, h4, h5 {
+  margin-top: 3px;
+  margin-bottom: 6px;
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+h3 {
+  font-size: 1.2em;
+}
+
+label, input, textarea {
+  display: block;
+}
+
+label {
+  font-weight: bold;
+}
+
+:link, :visited {
+  text-decoration: none;
+}
+
+ol, ul {
+  list-style: none;
+  background-color: #333333;
+  flex: 1;
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+li:nth-child(even) {
+  background-color: #444444;
+
+}
+
+li {
+  padding: 6px;
+}
+
+
+.wrapper{
+  flex: 1;
+  padding: 6px;
+  display: flex;
+  overflow: hidden;
+}
+
+.box {
+  padding: 6px;
+  background-color: #111111;
+}
+
+.h-group {
+  display: flex;
+  flex-direction: row;
+}
+.h-group > * {
+  margin-right: 3px;
+}
+.h-group > *:last-child {
+  margin-right: 0px;
+}
+
+.v-group {
+  display: flex;
+  flex-direction: column;
+}
+.v-group > * {
+  margin-bottom: 3px;
+}
+
+.v-group > *:last-child {
+  margin-bottom: 0px;
+}
+
+.h-flex, .v-flex {
+  display: flex;
+}
+
+.flex {
+  flex: 1;
+}
+
+.v-flex {
+  flex-flow: column;
+}
+
+.container {
+  display: flex;
+  flex: 1;
+  height: 100%;
+}
+
+.page {
+  display: none;
+  padding: 6px;
+  flex: 1;
+  background-color: #222222;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.header {
+  vertical-align: middle;
+  align-content: center;
+  margin-bottom: 6px;
+}
+
+.logo {
+  display: block;
+  flex: 0;
+  display: flex;
+  align-items: center;
+  color: #7485a6;
+  font-family: sans-serif;
+  font-size: 16px;
+  font-style: italic;
+  font-weight:bolder;
+}
+
+.logo img {
+  margin-right: 6px;
+}
+
+.fileListItem{
+  word-break: break-all;
+  word-wrap: break-word;
+}
+
+#mapping {
+  display: flex;
+  flex: 1;
+  box-sizing: border-box;
+  overflow: hidden;
+  height: 100%;
+  user-select: none;
+  cursor: default;
+}
+
+#mapping > div {
+  flex: 0;
+  display: block;
+}
+
+#mapping .screen {
+  display: flex;
+  flex: 1;
+  cursor: pointer;
+}
+
+li.active {
+  background-color: #999900;
+}
+
+li.fileListItem {
+  display: flex;
+}
+
+li.fileListItem > div{
+  flex: 1;
+}
+
+li.fileListItem > button{
+  flex: 0;
+}
