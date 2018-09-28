@@ -37,6 +37,6 @@ Assign the slide to the mapped surface.
 ![output](https://raw.githubusercontent.com/rnd7/emerald/master/doc/emerald_output.png)
 
 You might tweak the slide settings. Hint: To clear the slide texture change the Texture Width or height.
-![output](https://raw.githubusercontent.com/rnd7/emerald/master/doc/emerald_output.png)
+![settings](https://raw.githubusercontent.com/rnd7/emerald/master/doc/emerald_settings.png)
 
 Voila! You've got a projection mapped slideshow.
